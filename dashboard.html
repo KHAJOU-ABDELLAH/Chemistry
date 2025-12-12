@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wicked Problems Research Hub - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-dark: #0a192f;
+            --secondary-dark: #112240;
+            --tertiary-dark: #233554;
+            --accent-blue: #64ffda;
+            --accent-light: #8892b0;
+            --text-light: #ccd6f6;
+            --warning: #ff6b6b;
+            --success: #4ecdc4;
+            --purple: #a855f7;
+        }
+
+        body {
+            background: var(--primary-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 260px;
+            background: var(--secondary-dark);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo h1 {
+            font-size: 22px;
+            color: var(--accent-blue);
+            margin-bottom: 5px;
+        }
+
+        .logo span {
+            font-size: 12px;
+            color: var(--accent-light);
+            opacity: 0.8;
+        }
+
+        .user-info {
+            background: rgba(100, 255, 218, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .user-info h3 {
+            color: var(--accent-blue);
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .user-info p {
+            font-size: 12px;
+            color: var(--accent-light);
+        }
+
+        .user-role {
+            display: inline-block;
+            padding: 3px 10px;
+            background: var(--accent-blue);
+            color: var(--primary-dark);
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .user-role.admin {
+            background: var(--warning);
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex: 1;
+        }
+
+        .nav-menu li {
+            margin-bottom: 10px;
+        }
+
+        .nav-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            color: var(--accent-light);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-menu a:hover {
+            background: rgba(100, 255, 218, 0.1);
+            color: var(--accent-blue);
+        }
+
+        .nav-menu a.active {
+            background: rgba(100, 255, 218, 0.15);
+            color: var(--accent-blue);
+            border-left: 3px solid var(--accent-blue);
+        }
+
+        .logout-btn {
+            background: rgba(255, 107, 107, 0.1);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: auto;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 107, 107, 0.2);
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h2 {
+            color: var(--accent-blue);
+            font-size: 24px;
+        }
+
+        .date-display {
+            color: var(--accent-light);
+            font-size: 14px;
+        }
+
+        /* Content Area */
+        .content-area {
+            display: none;
+        }
+
+        .content-area.active {
+            display: block;
+        }
+
+        /* Grid Layout */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: var(--secondary-dark);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card-header h3 {
+            color: var(--accent-blue);
+            font-size: 18px;
+        }
+
+        /* Report Editor */
+        .word-count {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            background: rgba(100, 255, 218, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+        }
+
+        .word-count span {
+            color: var(--accent-blue);
+            font-weight: bold;
+        }
+
+        #reportEditor {
+            width: 100%;
+            min-height: 400px;
+            background: var(--tertiary-dark);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            color: var(--text-light);
+            font-size: 14px;
+            line-height: 1.6;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+        }
+
+        .editor-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* Task Manager */
+        .task-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .task-input input {
+            flex: 1;
+            padding: 12px 15px;
+            background: var(--tertiary-dark);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-light);
+        }
+
+        .task-list {
+            list-style: none;
+        }
+
+        .task-item {
+            background: var(--tertiary-dark);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .task-item.completed {
+            opacity: 0.7;
+            border-left-color: var(--success);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .task-actions button {
+            background: none;
+            border: none;
+            color: var(--accent-light);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 5px;
+        }
+
+        .task-actions button:hover {
+            color: var(--accent-blue);
+        }
+
+        /* Literature Repository */
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .category-tab {
+            padding: 8px 16px;
+            background: var(--tertiary-dark);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .category-tab.active {
+            background: var(--accent-blue);
+            color: var(--primary-dark);
+        }
+
+        .article-form {
+            background: var(--tertiary-dark);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-row input,
+        .form-row select {
+            flex: 1;
+            padding: 10px;
+            background: var(--secondary-dark);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            color: var(--text-light);
+        }
+
+        .articles-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .article-item {
+            background: var(--tertiary-dark);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid;
+        }
+
+        .article-item.anode {
+            border-left-color: var(--accent-blue);
+        }
+
+        .article-item.cathode {
+            border-left-color: var(--purple);
+        }
+
+        .article-item.geopolitical {
+            border-left-color: var(--warning);
+        }
+
+        .article-item.recycling {
+            border-left-color: var(--success);
+        }
+
+        .article-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--text-light);
+        }
+
+        .article-meta {
+            font-size: 12px;
+            color: var(--accent-light);
+            margin-bottom: 10px;
+        }
+
+        /* Chemistry Toolkit */
+        .toolkit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .tool-card {
+            background: var(--tertiary-dark);
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-light);
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .tool-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-3px);
+        }
+
+        .tool-icon {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+
+        .tool-card h4 {
+            color: var(--accent-blue);
+            margin-bottom: 10px;
+        }
+
+        .tool-card p {
+            font-size: 12px;
+            color: var(--accent-light);
+        }
+
+        /* Admin Panel */
+        .admin-users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .admin-user-card {
+            background: var(--tertiary-dark);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--accent-blue);
+            color: var(--primary-dark);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent-light);
+            border: 1px solid var(--accent-light);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+
+        /* Utility Classes */
+        .hidden {
+            display: none;
+        }
+
+        .text-success {
+            color: var(--success);
+        }
+
+        .text-warning {
+            color: var(--warning);
+        }
+
+        .text-accent {
+            color: var(--accent-blue);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--secondary-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-light);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-blue);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <h1>⚗️ Wicked Problems</h1>
+                <span>Critical Raw Materials & Batteries</span>
+                <span>Chemistry 101 Project</span>
+            </div>
+
+            <div class="user-info" id="userInfoDisplay">
+                <!-- User info will be populated by JavaScript -->
+            </div>
+
+            <ul class="nav-menu">
+                <li><a href="#dashboard" class="active" onclick="showSection('dashboard')">
+                    📊 Dashboard
+                </a></li>
+                <li><a href="#report" onclick="showSection('report')">
+                    📝 Report Editor
+                </a></li>
+                <li><a href="#tasks" onclick="showSection('tasks')">
+                    ✅ Task Manager
+                </a></li>
+                <li><a href="#literature" onclick="showSection('literature')">
+                    📚 Literature Repository
+                </a></li>
+                <li><a href="#chemistry" onclick="showSection('chemistry')">
+                    🔬 Chemistry Toolkit
+                </a></li>
+                <li><a href="#references" onclick="showSection('references')">
+                    📑 ACS Reference Generator
+                </a></li>
+                <li><a href="#admin" class="admin-only" onclick="showSection('admin')">
+                    👑 Admin Panel
+                </a></li>
+            </ul>
+
+            <div class="logout-btn" onclick="logout()">
+                🚪 Logout
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h2 id="sectionTitle">Dashboard</h2>
+                <div class="date-display" id="currentDate"></div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="content-area active">
+                <div class="grid-container">
+                    <div class="card">
+                        <div class="card-header">
+                            <span>📊</span>
+                            <h3>Project Overview</h3>
+                        </div>
+                        <div class="project-stats">
+                            <p><strong>Topic:</strong> Critical Raw Materials for Battery Technology</p>
+                            <p><strong>Due Date:</strong> January 23, 2026</p>
+                            <p><strong>Report Length:</strong> 10 pages (approx. 3000 words)</p>
+                            <p><strong>Submission:</strong> johan.jacquemin@um6p.ma</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span>✅</span>
+                            <h3>Task Progress</h3>
+                        </div>
+                        <div id="taskProgress">
+                            <!-- Progress will be populated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span>📝</span>
+                            <h3>Report Status</h3>
+                        </div>
+                        <div id="reportStatus">
+                            <!-- Report status will be populated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span>📚</span>
+                            <h3>Literature Collection</h3>
+                        </div>
+                        <div id="literatureStats">
+                            <!-- Literature stats will be populated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span>⚠️</span>
+                            <h3>Peer Evaluation Reminder</h3>
+                        </div>
+                        <div id="peerEvalReminder">
+                            <!-- Peer eval reminder will be populated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <span>💾</span>
+                            <h3>Data Management</h3>
+                        </div>
+                        <div class="data-actions">
+                            <button class="btn" onclick="exportAllData()">
+                                💾 Export All Data
+                            </button>
+                            <button class="btn btn-secondary" onclick="clearLocalData()">
+                                🗑️ Clear Local Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Editor Section -->
+            <div id="report" class="content-area">
+                <div class="card">
+                    <div class="card-header">
+                        <span>📝</span>
+                        <h3>Scientific Report Editor</h3>
+                    </div>
+                    
+                    <div class="word-count">
+                        <div>Word Count: <span id="wordCount">0</span> words</div>
+                        <div>Page Count: <span id="pageCount">0</span> / 10 pages</div>
+                        <div>Target: 3000 words (approx. 10 pages)</div>
+                    </div>
+
+                    <textarea id="reportEditor" placeholder="Start writing your 10-page scientific report here...
+
+Suggested Structure:
+1. Introduction to Critical Raw Materials
+2. Battery Chemistry Fundamentals
+3. Material Supply Chain Analysis
+4. Environmental Impact Assessment
+5. Future Alternatives and Research
+6. Conclusion and Recommendations
+
+Remember to use ACS citation style for references."></textarea>
+
+                    <div class="editor-buttons">
+                        <button class="btn" onclick="saveReport()">
+                            💾 Save Report
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportReportPDF()">
+                            📄 Download as PDF
+                        </button>
+                        <button class="btn btn-secondary" onclick="copyReportToClipboard()">
+                            📋 Copy to Clipboard
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearReport()">
+                            🗑️ Clear Report
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Task Manager Section -->
+            <div id="tasks" class="content-area">
+                <div class="card">
+                    <div class="card-header">
+                        <span>✅</span>
+                        <h3>Wicked Problems Task Manager</h3>
+                    </div>
+
+                    <div class="task-input">
+                        <input type="text" id="newTaskInput" placeholder="Add a new task...">
+                        <button class="btn" onclick="addTask()">
+                            ➕ Add Task
+                        </button>
+                    </div>
+
+                    <div class="word-count" style="margin: 20px 0;">
+                        <div>Total Tasks: <span id="totalTasks">0</span></div>
+                        <div>Completed: <span id="completedTasks">0</span></div>
+                        <div>Pending: <span id="pendingTasks">0</span></div>
+                    </div>
+
+                    <ul class="task-list" id="taskList">
+                        <!-- Tasks will be populated here -->
+                    </ul>
+
+                    <div class="editor-buttons" style="margin-top: 20px;">
+                        <button class="btn" onclick="saveTasks()">
+                            💾 Save Tasks
+                        </button>
+                        <button class="btn btn-secondary" onclick="resetToDefaultTasks()">
+                            🔄 Reset to Default Tasks
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearAllTasks()">
+                            🗑️ Clear All Tasks
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Literature Repository Section -->
+            <div id="literature" class="content-area">
+                <div class="card">
+                    <div class="card-header">
+                        <span>📚</span>
+                        <h3>Literature Repository</h3>
+                    </div>
+
+                    <div class="category-tabs">
+                        <div class="category-tab active" onclick="filterArticles('all')">All Articles</div>
+                        <div class="category-tab" onclick="filterArticles('anode')">Anode Chemistry</div>
+                        <div class="category-tab" onclick="filterArticles('cathode')">Cathode Materials</div>
+                        <div class="category-tab" onclick="filterArticles('geopolitical')">Geopolitical Constraints</div>
+                        <div class="category-tab" onclick="filterArticles('recycling')">Recycling Processes</div>
+                    </div>
+
+                    <div class="article-form">
+                        <div class="form-row">
+                            <input type="text" id="articleTitle" placeholder="Article Title">
+                            <input type="text" id="articleUrl" placeholder="DOI or URL (optional)">
+                        </div>
+                        <div class="form-row">
+                            <select id="articleCategory">
+                                <option value="anode">Anode Chemistry</option>
+                                <option value="cathode">Cathode Materials</option>
+                                <option value="geopolitical">Geopolitical Constraints</option>
+                                <option value="recycling">Recycling Processes</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <input type="text" id="articleAuthors" placeholder="Authors (optional)">
+                            <button class="btn" onclick="addArticle()">
+                                📥 Add Article
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="articles-list" id="articlesList">
+                        <!-- Articles will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chemistry Toolkit Section -->
+            <div id="chemistry" class="content-area">
+                <div class="card">
+                    <div class="card-header">
+                        <span>🔬</span>
+                        <h3>Chemistry Toolkit</h3>
+                    </div>
+
+                    <div class="toolkit-grid">
+                        <a href="https://avogadro.cc/" target="_blank" class="tool-card">
+                            <div class="tool-icon">⚛️</div>
+                            <h4>Avogadro</h4>
+                            <p>Advanced molecular editor and visualizer for computational chemistry</p>
+                        </a>
+
+                        <a href="http://jmol.sourceforge.net/" target="_blank" class="tool-card">
+                            <div class="tool-icon">🧪</div>
+                            <h4>Jmol</h4>
+                            <p>Java-based viewer for chemical structures in 3D with spectroscopy data</p>
+                        </a>
+
+                        <a href="https://webbook.nist.gov/chemistry/" target="_blank" class="tool-card">
+                            <div class="tool-icon">📊</div>
+                            <h4>NIST Chemistry WebBook</h4>
+                            <p>Thermochemical, thermophysical, and ion energetics data</p>
+                        </a>
+
+                        <a href="https://www.rsc.org/publishing/journals/" target="_blank" class="tool-card">
+                            <div class="tool-icon">📚</div>
+                            <h4>RSC Journals</h4>
+                            <p>Royal Society of Chemistry publications on materials science</p>
+                        </a>
+
+                        <a href="https://pubs.acs.org/" target="_blank" class="tool-card">
+                            <div class="tool-icon">🔍</div>
+                            <h4>ACS Publications</h4>
+                            <p>American Chemical Society journals and articles</p>
+                        </a>
+
+                        <a href="https://www.sciencedirect.com/" target="_blank" class="tool-card">
+                            <div class="tool-icon">🔬</div>
+                            <h4>ScienceDirect</h4>
+                            <p>Elsevier's database of scientific and medical research</p>
+                        </a>
+
+                        <a href="https://www.ccdc.cam.ac.uk/" target="_blank" class="tool-card">
+                            <div class="tool-icon">💎</div>
+                            <h4>Cambridge Crystallographic</h4>
+                            <p>Crystal structure database for materials characterization</p>
+                        </a>
+
+                        <a href="https://materialsproject.org/" target="_blank" class="tool-card">
+                            <div class="tool-icon">⚡</div>
+                            <h4>Materials Project</h4>
+                            <p>Database of computed materials properties for battery research</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACS Reference Generator -->
+            <div id="references" class="content-area">
+                <div class="card">
+                    <div class="card-header">
+                        <span>📑</span>
+                        <h3>ACS Reference Generator</h3>
+                    </div>
+
+                    <div class="article-form">
+                        <div class="form-row">
+                            <input type="text" id="refAuthors" placeholder="Authors (e.g., Smith, J. R.; Johnson, A. B.)">
+                            <input type="text" id="refYear" placeholder="Year (e.g., 2024)">
+                        </div>
+                        <div class="form-row">
+                            <input type="text" id="refTitle" placeholder="Article Title">
+                            <input type="text" id="refJournal" placeholder="Journal Name">
+                        </div>
+                        <div class="form-row">
+                            <input type="text" id="refVolume" placeholder="Volume">
+                            <input type="text" id="refIssue" placeholder="Issue (optional)">
+                            <input type="text" id="refPages" placeholder="Pages (e.g., 1234-1245)">
+                            <input type="text" id="refDOI" placeholder="DOI (optional)">
+                        </div>
+                        <button class="btn" onclick="generateACSReference()">
+                            🧪 Generate ACS Reference
+                        </button>
+                    </div>
+
+                    <div class="word-count" style="margin: 20px 0;">
+                        <h4>Generated Reference:</h4>
+                        <textarea id="generatedReference" style="width: 100%; height: 100px; margin-top: 10px;" readonly></textarea>
+                        <button class="btn btn-secondary" onclick="copyReference()" style="margin-top: 10px;">
+                            📋 Copy Reference
+                        </button>
+                    </div>
+
+                    <div class="instructions">
+                        <h4>📋 ACS Style Guidelines:</h4>
+                        <ul>
+                            <li>Authors: Last Name, First Initial.; Last Name, First Initial.</li>
+                            <li>Article Title in Sentence Case</li>
+                            <li>Journal Name in Italics (Abbreviated)</li>
+                            <li>Year, Volume(Issue), Pages</li>
+                            <li>DOI if available</li>
+                        </ul>
+                        <p><strong>Example:</strong> Smith, J. R.; Johnson, A. B. Advances in Lithium-Ion Battery Technology. <em>J. Electrochem. Soc.</em> 2024, <em>171</em>(3), 1234-1245. DOI: 10.1149/123456</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Panel -->
+            <div id="admin" class="content-area">
+                <div class="card">
+                    <div class="card-header">
+                        <span>👑</span>
+                        <h3>Admin Panel - User Management</h3>
+                    </div>
+
+                    <div class="admin-users-grid" id="adminUsersGrid">
+                        <!-- Admin view of users will be populated here -->
+                    </div>
+
+                    <div class="editor-buttons" style="margin-top: 20px;">
+                        <button class="btn" onclick="exportAllUsersData()">
+                            📊 Export All Users Data
+                        </button>
+                        <button class="btn btn-warning" onclick="resetAllUsersData()">
+                            🔄 Reset All Users Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ====================
+        // GLOBAL VARIABLES
+        // ====================
+        let currentUser = null;
+        let userTasks = [];
+        let userArticles = [];
+        let userReport = "";
+
+        // ====================
+        // INITIALIZATION
+        // ====================
+        window.onload = function() {
+            // Check if user is logged in
+            const storedUser = localStorage.getItem('currentUser');
+            if (!storedUser) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            currentUser = JSON.parse(storedUser);
+            loadUserData();
+            updateUI();
+            checkPeerEvaluationReminder();
+            
+            // Set current date
+            document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // Set default tasks if none exist
+            if (userTasks.length === 0) {
+                resetToDefaultTasks();
+            }
+        };
+
+        // ====================
+        // DATA MANAGEMENT
+        // ====================
+        function loadUserData() {
+            const userId = currentUser.id;
+            
+            // Load tasks
+            const storedTasks = localStorage.getItem(`tasks_${userId}`);
+            userTasks = storedTasks ? JSON.parse(storedTasks) : [];
+            
+            // Load articles
+            const storedArticles = localStorage.getItem(`articles_${userId}`);
+            userArticles = storedArticles ? JSON.parse(storedArticles) : [];
+            
+            // Load report
+            const storedReport = localStorage.getItem(`report_${userId}`);
+            userReport = storedReport || "";
+            
+            updateTaskDisplay();
+            updateArticlesDisplay();
+            updateReportDisplay();
+        }
+
+        function saveUserData() {
+            const userId = currentUser.id;
+            localStorage.setItem(`tasks_${userId}`, JSON.stringify(userTasks));
+            localStorage.setItem(`articles_${userId}`, JSON.stringify(userArticles));
+            localStorage.setItem(`report_${userId}`, userReport);
+        }
+
+        // ====================
+        // UI UPDATES
+        // ====================
+        function updateUI() {
+            // Update user info
+            document.getElementById('userInfoDisplay').innerHTML = `
+                <h3>${currentUser.name}</h3>
+                <p>${currentUser.email}</p>
+                <span class="user-role ${currentUser.role}">${currentUser.role.toUpperCase()}</span>
+            `;
+
+            // Show/hide admin menu item
+            const adminMenuItems = document.querySelectorAll('.admin-only');
+            adminMenuItems.forEach(item => {
+                item.style.display = currentUser.isAdmin ? 'flex' : 'none';
+            });
+
+            // Update dashboard stats
+            updateDashboardStats();
+        }
+
+        function updateDashboardStats() {
+            // Task progress
+            const completed = userTasks.filter(t => t.completed).length;
+            const total = userTasks.length;
+            const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+            document.getElementById('taskProgress').innerHTML = `
+                <div style="margin: 10px 0;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                        <span>Progress</span>
+                        <span>${progress}%</span>
+                    </div>
+                    <div style="background: var(--tertiary-dark); height: 10px; border-radius: 5px; overflow: hidden;">
+                        <div style="background: var(--accent-blue); width: ${progress}%; height: 100%;"></div>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 12px; color: var(--accent-light);">
+                        ${completed} of ${total} tasks completed
+                    </div>
+                </div>
+            `;
+
+            // Report status
+            const wordCount = userReport.split(/\s+/).filter(word => word.length > 0).length;
+            const pageCount = Math.ceil(wordCount / 300);
+            
+            document.getElementById('reportStatus').innerHTML = `
+                <div style="margin: 10px 0;">
+                    <div style="font-size: 24px; color: var(--accent-blue); font-weight: bold;">
+                        ${wordCount} words
+                    </div>
+                    <div style="font-size: 14px; color: var(--accent-light);">
+                        Approximately ${pageCount} of 10 pages
+                    </div>
+                    <div style="margin-top: 10px; font-size: 12px;">
+                        ${wordCount >= 3000 ? '✅ Target reached!' : `Need ${3000 - wordCount} more words`}
+                    </div>
+                </div>
+            `;
+
+            // Literature stats
+            document.getElementById('literatureStats').innerHTML = `
+                <div style="margin: 10px 0;">
+                    <div style="font-size: 24px; color: var(--accent-blue); font-weight: bold;">
+                        ${userArticles.length} articles
+                    </div>
+                    <div style="font-size: 12px; color: var(--accent-light); margin-top: 5px;">
+                        Categorized by relevance for your research
+                    </div>
+                </div>
+            `;
+
+            // Peer evaluation reminder
+            const deadline = new Date('2026-01-23');
+            const today = new Date();
+            const daysUntilDeadline = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+            
+            let reminderText = '';
+            if (daysUntilDeadline <= 0) {
+                reminderText = '⚠️ Peer evaluations are overdue!';
+            } else if (daysUntilDeadline <= 7) {
+                reminderText = `⚠️ Peer evaluations due in ${daysUntilDeadline} days!`;
+            } else if (daysUntilDeadline <= 14) {
+                reminderText = `ℹ️ Peer evaluations due in ${daysUntilDeadline} days`;
+            } else {
+                reminderText = `✅ Peer evaluations due in ${daysUntilDeadline} days`;
+            }
+            
+            document.getElementById('peerEvalReminder').innerHTML = `
+                <div style="margin: 10px 0;">
+                    <div style="color: ${daysUntilDeadline <= 7 ? 'var(--warning)' : 'var(--accent-blue)'}">
+                        ${reminderText}
+                    </div>
+                    <div style="font-size: 12px; color: var(--accent-light); margin-top: 5px;">
+                        Due: January 23, 2026
+                    </div>
+                </div>
+            `;
+        }
+
+        // ====================
+        // SECTION NAVIGATION
+        // ====================
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-area').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-menu a').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update active nav item
+            document.querySelector(`.nav-menu a[href="#${sectionId}"]`).classList.add('active');
+            
+            // Update section title
+            const titles = {
+                'dashboard': 'Dashboard',
+                'report': 'Report Editor',
+                'tasks': 'Task Manager',
+                'literature': 'Literature Repository',
+                'chemistry': 'Chemistry Toolkit',
+                'references': 'ACS Reference Generator',
+                'admin': 'Admin Panel'
+            };
+            
+            document.getElementById('sectionTitle').textContent = titles[sectionId];
+            
+            // Special handling for admin section
+            if (sectionId === 'admin' && currentUser.isAdmin) {
+                loadAdminView();
+            }
+        }
+
+        // ====================
+        // REPORT EDITOR FUNCTIONS
+        // ====================
+        function updateReportDisplay() {
+            const editor = document.getElementById('reportEditor');
+            editor.value = userReport;
+            updateWordCount();
+        }
+
+        function updateWordCount() {
+            const text = document.getElementById('reportEditor').value;
+            const wordCount = text.split(/\s+/).filter(word => word.length > 0).length;
+            const pageCount = Math.ceil(wordCount / 300);
+            
+            document.getElementById('wordCount').textContent = wordCount;
+            document.getElementById('pageCount').textContent = pageCount;
+            
+            // Auto-save on significant changes
+            if (text !== userReport && wordCount % 50 === 0) {
+                userReport = text;
+                saveReport();
+            }
+        }
+
+        function saveReport() {
+            userReport = document.getElementById('reportEditor').value;
+            const userId = currentUser.id;
+            localStorage.setItem(`report_${userId}`, userReport);
+            
+            // Show success message
+            showNotification('Report saved successfully!', 'success');
+            updateDashboardStats();
+        }
+
+        function exportReportPDF() {
+            const text = document.getElementById('reportEditor').value;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `WickedProblems_Report_${currentUser.name.replace(/\s+/g, '_')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Report exported as text file!', 'success');
+        }
+
+        function copyReportToClipboard() {
+            const text = document.getElementById('reportEditor').value;
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification('Report copied to clipboard!', 'success');
+            });
+        }
+
+        function clearReport() {
+            if (confirm('Are you sure you want to clear the entire report? This cannot be undone.')) {
+                document.getElementById('reportEditor').value = '';
+                userReport = '';
+                saveReport();
+                updateWordCount();
+            }
+        }
+
+        // ====================
+        // TASK MANAGER FUNCTIONS
+        // ====================
+        function updateTaskDisplay() {
+            const taskList = document.getElementById('taskList');
+            const completed = userTasks.filter(t => t.completed).length;
+            const total = userTasks.length;
+            const pending = total - completed;
+            
+            document.getElementById('totalTasks').textContent = total;
+            document.getElementById('completedTasks').textContent = completed;
+            document.getElementById('pendingTasks').textContent = pending;
+            
+            taskList.innerHTML = userTasks.map((task, index) => `
+                <li class="task-item ${task.completed ? 'completed' : ''}">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} 
+                               onchange="toggleTask(${index})" style="cursor: pointer;">
+                        <span>${task.text}</span>
+                    </div>
+                    <div class="task-actions">
+                        <button onclick="editTask(${index})" title="Edit">✏️</button>
+                        <button onclick="deleteTask(${index})" title="Delete">🗑️</button>
+                    </div>
+                </li>
+            `).join('');
+            
+            updateDashboardStats();
+        }
+
+        function addTask() {
+            const input = document.getElementById('newTaskInput');
+            const text = input.value.trim();
+            
+            if (text) {
+                userTasks.push({
+                    text: text,
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                });
+                
+                input.value = '';
+                saveTasks();
+                updateTaskDisplay();
+                showNotification('Task added!', 'success');
+            }
+        }
+
+        function toggleTask(index) {
+            userTasks[index].completed = !userTasks[index].completed;
+            saveTasks();
+            updateTaskDisplay();
+        }
+
+        function editTask(index) {
+            const newText = prompt('Edit task:', userTasks[index].text);
+            if (newText !== null && newText.trim()) {
+                userTasks[index].text = newText.trim();
+                saveTasks();
+                updateTaskDisplay();
+            }
+        }
+
+        function deleteTask(index) {
+            if (confirm('Delete this task?')) {
+                userTasks.splice(index, 1);
+                saveTasks();
+                updateTaskDisplay();
+            }
+        }
+
+        function saveTasks() {
+            const userId = currentUser.id;
+            localStorage.setItem(`tasks_${userId}`, JSON.stringify(userTasks));
+            showNotification('Tasks saved!', 'success');
+        }
+
+        function resetToDefaultTasks() {
+            const defaultTasks = [
+                { text: "Literature Review: Critical Raw Materials", completed: false },
+                { text: "Chemical Analysis: Battery Components", completed: false },
+                { text: "ACS Referencing and Citations", completed: false },
+                { text: "Supply Chain Mapping", completed: false },
+                { text: "Environmental Impact Assessment", completed: false },
+                { text: "Future Alternatives Research", completed: false },
+                { text: "Draft Introduction Section", completed: false },
+                { text: "Complete Methodology Section", completed: false },
+                { text: "Write Results Analysis", completed: false },
+                { text: "Peer Evaluation Forms", completed: false },
+                { text: "Final Report Compilation", completed: false },
+                { text: "Proofread and Format", completed: false }
+            ];
+            
+            userTasks = defaultTasks;
+            saveTasks();
+            updateTaskDisplay();
+            showNotification('Reset to default tasks!', 'success');
+        }
+
+        function clearAllTasks() {
+            if (confirm('Clear all tasks? This cannot be undone.')) {
+                userTasks = [];
+                saveTasks();
+                updateTaskDisplay();
+            }
+        }
+
+        // ====================
+        // LITERATURE REPOSITORY
+        // ====================
+        function updateArticlesDisplay(filter = 'all') {
+            const articlesList = document.getElementById('articlesList');
+            let filteredArticles = userArticles;
+            
+            if (filter !== 'all') {
+                filteredArticles = userArticles.filter(article => article.category === filter);
+            }
+            
+            articlesList.innerHTML = filteredArticles.map((article, index) => `
+                <div class="article-item ${article.category}">
+                    <div class="article-title">${article.title}</div>
+                    <div class="article-meta">
+                        ${article.authors ? `Authors: ${article.authors} | ` : ''}
+                        Category: ${getCategoryName(article.category)}
+                        ${article.addedAt ? ` | Added: ${new Date(article.addedAt).toLocaleDateString()}` : ''}
+                    </div>
+                    ${article.url ? `<div style="margin-top: 5px;">
+                        <a href="${article.url}" target="_blank" style="color: var(--accent-blue); font-size: 12px;">
+                            🔗 ${article.url}
+                        </a>
+                    </div>` : ''}
+                    <div class="task-actions" style="margin-top: 10px;">
+                        <button onclick="editArticle(${index})" title="Edit">✏️</button>
+                        <button onclick="deleteArticle(${index})" title="Delete">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getCategoryName(category) {
+            const categories = {
+                'anode': 'Anode Chemistry',
+                'cathode': 'Cathode Materials',
+                'geopolitical': 'Geopolitical Constraints',
+                'recycling': 'Recycling Processes',
+                'other': 'Other'
+            };
+            return categories[category] || category;
+        }
+
+        function filterArticles(category) {
+            // Update active tab
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            updateArticlesDisplay(category);
+        }
+
+        function addArticle() {
+            const title = document.getElementById('articleTitle').value.trim();
+            const url = document.getElementById('articleUrl').value.trim();
+            const category = document.getElementById('articleCategory').value;
+            const authors = document.getElementById('articleAuthors').value.trim();
+            
+            if (!title) {
+                showNotification('Please enter article title!', 'warning');
+                return;
+            }
+            
+            userArticles.push({
+                title: title,
+                url: url || null,
+                category: category,
+                authors: authors || null,
+                addedAt: new Date().toISOString()
+            });
+            
+            // Clear form
+            document.getElementById('articleTitle').value = '';
+            document.getElementById('articleUrl').value = '';
+            document.getElementById('articleAuthors').value = '';
+            
+            saveArticles();
+            updateArticlesDisplay();
+            updateDashboardStats();
+            showNotification('Article added to repository!', 'success');
+        }
+
+        function editArticle(index) {
+            const article = userArticles[index];
+            const newTitle = prompt('Edit article title:', article.title);
+            if (newTitle !== null && newTitle.trim()) {
+                userArticles[index].title = newTitle.trim();
+                const newUrl = prompt('Edit URL (or leave empty):', article.url || '');
+                userArticles[index].url = newUrl.trim() || null;
+                const newAuthors = prompt('Edit authors:', article.authors || '');
+                userArticles[index].authors = newAuthors.trim() || null;
+                saveArticles();
+                updateArticlesDisplay();
+            }
+        }
+
+        function deleteArticle(index) {
+            if (confirm('Delete this article from repository?')) {
+                userArticles.splice(index, 1);
+                saveArticles();
+                updateArticlesDisplay();
+            }
+        }
+
+        function saveArticles() {
+            const userId = currentUser.id;
+            localStorage.setItem(`articles_${userId}`, JSON.stringify(userArticles));
+        }
+
+        // ====================
+        // ACS REFERENCE GENERATOR
+        // ====================
+        function generateACSReference() {
+            const authors = document.getElementById('refAuthors').value.trim();
+            const year = document.getElementById('refYear').value.trim();
+            const title = document.getElementById('refTitle').value.trim();
+            const journal = document.getElementById('refJournal').value.trim();
+            const volume = document.getElementById('refVolume').value.trim();
+            const issue = document.getElementById('refIssue').value.trim();
+            const pages = document.getElementById('refPages').value.trim();
+            const doi = document.getElementById('refDOI').value.trim();
+            
+            if (!authors || !year || !title || !journal || !volume || !pages) {
+                showNotification('Please fill in all required fields!', 'warning');
+                return;
+            }
+            
+            let reference = `${authors} ${title}. `;
+            reference += `<em>${journal}</em> `;
+            reference += `${year}, `;
+            reference += `<em>${volume}</em>`;
+            if (issue) reference += `(${issue})`;
+            reference += `, ${pages}.`;
+            if (doi) reference += ` DOI: ${doi}`;
+            
+            document.getElementById('generatedReference').value = reference;
+        }
+
+        function copyReference() {
+            const reference = document.getElementById('generatedReference').value;
+            if (!reference) {
+                showNotification('No reference to copy!', 'warning');
+                return;
+            }
+            
+            navigator.clipboard.writeText(reference).then(() => {
+                showNotification('Reference copied to clipboard!', 'success');
+            });
+        }
+
+        // ====================
+        // ADMIN FUNCTIONS
+        // ====================
+        function loadAdminView() {
+            if (!currentUser.isAdmin) return;
+            
+            const predefinedUsers = JSON.parse(localStorage.getItem('wickedProblemsUsers')) || [];
+            const adminGrid = document.getElementById('adminUsersGrid');
+            
+            adminGrid.innerHTML = predefinedUsers.map(user => {
+                // Load user data
+                const userTasks = JSON.parse(localStorage.getItem(`tasks_${user.id}`)) || [];
+                const userArticles = JSON.parse(localStorage.getItem(`articles_${user.id}`)) || [];
+                const userReport = localStorage.getItem(`report_${user.id}`) || '';
+                const wordCount = userReport.split(/\s+/).filter(w => w.length > 0).length;
+                const completedTasks = userTasks.filter(t => t.completed).length;
+                
+                return `
+                    <div class="admin-user-card">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div>
+                                <h4>${user.name}</h4>
+                                <p style="font-size: 12px; color: var(--accent-light);">${user.email}</p>
+                                <span class="user-role ${user.role}" style="margin-top: 5px;">${user.role.toUpperCase()}</span>
+                            </div>
+                            <button class="btn btn-secondary" onclick="viewUserData(${user.id})" style="font-size: 12px; padding: 8px 12px;">
+                                View Data
+                            </button>
+                        </div>
+                        
+                        <div style="margin-top: 15px; font-size: 12px;">
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                                <div>
+                                    <div style="color: var(--accent-light);">Report</div>
+                                    <div style="color: var(--accent-blue);">${wordCount} words</div>
+                                </div>
+                                <div>
+                                    <div style="color: var(--accent-light);">Tasks</div>
+                                    <div style="color: var(--accent-blue);">${completedTasks}/${userTasks.length}</div>
+                                </div>
+                                <div>
+                                    <div style="color: var(--accent-light);">Articles</div>
+                                    <div style="color: var(--accent-blue);">${userArticles.length}</div>
+                                </div>
+                                <div>
+                                    <div style="color: var(--accent-light);">Last Active</div>
+                                    <div style="color: var(--accent-blue);">Today</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function viewUserData(userId) {
+            const userTasks = JSON.parse(localStorage.getItem(`tasks_${userId}`)) || [];
+            const userArticles = JSON.parse(localStorage.getItem(`articles_${userId}`)) || [];
+            const userReport = localStorage.getItem(`report_${userId}`) || '';
+            
+            let message = `USER DATA REPORT\n\n`;
+            message += `Tasks (${userTasks.length}):\n`;
+            userTasks.forEach(task => {
+                message += `  ${task.completed ? '✅' : '⬜'} ${task.text}\n`;
+            });
+            
+            message += `\nArticles (${userArticles.length}):\n`;
+            userArticles.forEach(article => {
+                message += `  📚 ${article.title}\n`;
+            });
+            
+            message += `\nReport Summary:\n`;
+            message += `  ${userReport.length} characters\n`;
+            message += `  ${userReport.split(/\s+/).filter(w => w.length > 0).length} words\n`;
+            
+            alert(message);
+        }
+
+        function exportAllUsersData() {
+            if (!currentUser.isAdmin) return;
+            
+            const predefinedUsers = JSON.parse(localStorage.getItem('wickedProblemsUsers')) || [];
+            let exportData = 'WICKED PROBLEMS HUB - ALL USERS DATA EXPORT\n';
+            exportData += '='.repeat(50) + '\n\n';
+            
+            predefinedUsers.forEach(user => {
+                exportData += `USER: ${user.name} (${user.email})\n`;
+                exportData += '-'.repeat(40) + '\n';
+                
+                const userTasks = JSON.parse(localStorage.getItem(`tasks_${user.id}`)) || [];
+                const userArticles = JSON.parse(localStorage.getItem(`articles_${user.id}`)) || [];
+                const userReport = localStorage.getItem(`report_${userId}`) || '';
+                
+                exportData += 'TASKS:\n';
+                userTasks.forEach(task => {
+                    exportData += `  [${task.completed ? 'X' : ' '}] ${task.text}\n`;
+                });
+                
+                exportData += '\nARTICLES:\n';
+                userArticles.forEach(article => {
+                    exportData += `  • ${article.title}\n`;
+                });
+                
+                exportData += '\nREPORT:\n';
+                exportData += userReport.substring(0, 500) + '...\n\n';
+                exportData += '='.repeat(50) + '\n\n';
+            });
+            
+            const blob = new Blob([exportData], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `WickedProblems_AllUsers_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('All users data exported!', 'success');
+        }
+
+        function resetAllUsersData() {
+            if (!currentUser.isAdmin) return;
+            
+            if (confirm('WARNING: This will reset ALL users data (reports, tasks, articles). Are you sure?')) {
+                const predefinedUsers = JSON.parse(localStorage.getItem('wickedProblemsUsers')) || [];
+                predefinedUsers.forEach(user => {
+                    localStorage.removeItem(`tasks_${user.id}`);
+                    localStorage.removeItem(`articles_${user.id}`);
+                    localStorage.removeItem(`report_${user.id}`);
+                });
+                
+                showNotification('All users data has been reset!', 'success');
+                loadAdminView();
+            }
+        }
+
+        // ====================
+        // UTILITY FUNCTIONS
+        // ====================
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
+        function checkPeerEvaluationReminder() {
+            const deadline = new Date('2026-01-23');
+            const today = new Date();
+            const daysUntilDeadline = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+            
+            if (daysUntilDeadline <= 7 && daysUntilDeadline > 0) {
+                setTimeout(() => {
+                    if (confirm(`⚠️ PEER EVALUATION REMINDER\n\nPeer evaluations are due in ${daysUntilDeadline} days (January 23, 2026).\n\nPlease complete your peer evaluation forms soon!`)) {
+                        showSection('dashboard');
+                    }
+                }, 2000);
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'var(--success)' : type === 'warning' ? 'var(--warning)' : 'var(--accent-blue)'};
+                color: ${type === 'success' || type === 'warning' ? 'white' : 'var(--primary-dark)'};
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+            `;
+            
+            notification.innerHTML = message;
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        function exportAllData() {
+            const exportObj = {
+                user: currentUser,
+                tasks: userTasks,
+                articles: userArticles,
+                report: userReport,
+                exportedAt: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `WickedProblems_${currentUser.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('All data exported successfully!', 'success');
+        }
+
+        function clearLocalData() {
+            if (confirm('Clear all your local data? This will delete your report, tasks, and articles. This cannot be undone.')) {
+                const userId = currentUser.id;
+                localStorage.removeItem(`tasks_${userId}`);
+                localStorage.removeItem(`articles_${userId}`);
+                localStorage.removeItem(`report_${userId}`);
+                
+                userTasks = [];
+                userArticles = [];
+                userReport = '';
+                
+                updateTaskDisplay();
+                updateArticlesDisplay();
+                updateReportDisplay();
+                showNotification('All local data cleared!', 'success');
+            }
+        }
+
+        // Add CSS animations for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
