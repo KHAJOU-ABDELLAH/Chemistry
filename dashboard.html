@@ -67,6 +67,7 @@
             padding: 15px;
             border-radius: 10px;
             margin-bottom: 30px;
+            position: relative;
         }
 
         .user-info h3 {
@@ -93,6 +94,20 @@
 
         .user-role.admin {
             background: var(--warning);
+        }
+
+        .data-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(100, 255, 218, 0.2);
+            border-radius: 10px;
+            padding: 5px 10px;
+            font-size: 10px;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .nav-menu {
@@ -137,6 +152,10 @@
             margin-top: auto;
             text-align: center;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .logout-btn:hover {
@@ -162,6 +181,31 @@
         .header h2 {
             color: var(--accent-blue);
             font-size: 24px;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .auto-save-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--accent-light);
+            background: rgba(100, 255, 218, 0.1);
+            padding: 8px 12px;
+            border-radius: 20px;
+        }
+
+        .auto-save-indicator.saving {
+            color: var(--warning);
+        }
+
+        .auto-save-indicator.saved {
+            color: var(--success);
         }
 
         .date-display {
@@ -222,11 +266,29 @@
             background: rgba(100, 255, 218, 0.1);
             padding: 10px 15px;
             border-radius: 8px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .word-count span {
             color: var(--accent-blue);
             font-weight: bold;
+        }
+
+        .word-count-progress {
+            width: 100%;
+            height: 5px;
+            background: var(--tertiary-dark);
+            border-radius: 3px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .word-count-progress-bar {
+            height: 100%;
+            background: var(--accent-blue);
+            width: 0%;
+            transition: width 0.5s ease;
         }
 
         #reportEditor {
@@ -247,6 +309,7 @@
             display: flex;
             gap: 10px;
             margin-top: 15px;
+            flex-wrap: wrap;
         }
 
         /* Task Manager */
@@ -267,6 +330,8 @@
 
         .task-list {
             list-style: none;
+            max-height: 400px;
+            overflow-y: auto;
         }
 
         .task-item {
@@ -278,6 +343,7 @@
             justify-content: space-between;
             align-items: center;
             border-left: 4px solid var(--accent-blue);
+            animation: slideIn 0.3s ease;
         }
 
         .task-item.completed {
@@ -336,11 +402,13 @@
             display: flex;
             gap: 15px;
             margin-bottom: 15px;
+            flex-wrap: wrap;
         }
 
         .form-row input,
         .form-row select {
             flex: 1;
+            min-width: 200px;
             padding: 10px;
             background: var(--secondary-dark);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -359,6 +427,7 @@
             border-radius: 8px;
             margin-bottom: 10px;
             border-left: 4px solid;
+            animation: slideIn 0.3s ease;
         }
 
         .article-item.anode {
@@ -405,6 +474,7 @@
             color: var(--text-light);
             transition: all 0.3s;
             border: 1px solid transparent;
+            display: block;
         }
 
         .tool-card:hover {
@@ -476,6 +546,16 @@
             color: white;
         }
 
+        .btn-success {
+            background: var(--success);
+            color: var(--primary-dark);
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+
         /* Utility Classes */
         .hidden {
             display: none;
@@ -491,6 +571,21 @@
 
         .text-accent {
             color: var(--accent-blue);
+        }
+
+        /* Data Backup Section */
+        .backup-section {
+            background: rgba(100, 255, 218, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .backup-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
         }
 
         /* Scrollbar */
@@ -510,6 +605,22 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--accent-blue);
         }
+
+        /* Animations */
+        @keyframes slideIn {
+            from { transform: translateX(-10px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
     </style>
 </head>
 <body>
@@ -524,6 +635,10 @@
 
             <div class="user-info" id="userInfoDisplay">
                 <!-- User info will be populated by JavaScript -->
+                <div class="data-status" id="dataStatus">
+                    <span class="pulse" id="autoSaveIndicator">●</span>
+                    <span id="lastSaved">Just now</span>
+                </div>
             </div>
 
             <ul class="nav-menu">
@@ -545,13 +660,17 @@
                 <li><a href="#references" onclick="showSection('references')">
                     📑 ACS Reference Generator
                 </a></li>
+                <li><a href="#backup" onclick="showSection('backup')">
+                    💾 Data Backup
+                </a></li>
                 <li><a href="#admin" class="admin-only" onclick="showSection('admin')">
                     👑 Admin Panel
                 </a></li>
             </ul>
 
             <div class="logout-btn" onclick="logout()">
-                🚪 Logout
+                <span>🚪</span>
+                <span>Logout & Save</span>
             </div>
         </div>
 
@@ -560,7 +679,13 @@
             <!-- Header -->
             <div class="header">
                 <h2 id="sectionTitle">Dashboard</h2>
-                <div class="date-display" id="currentDate"></div>
+                <div class="header-controls">
+                    <div class="auto-save-indicator" id="saveIndicator">
+                        <span>💾</span>
+                        <span id="saveStatus">Auto-save enabled</span>
+                    </div>
+                    <div class="date-display" id="currentDate"></div>
+                </div>
             </div>
 
             <!-- Dashboard Section -->
@@ -576,6 +701,7 @@
                             <p><strong>Due Date:</strong> January 23, 2026</p>
                             <p><strong>Report Length:</strong> 10 pages (approx. 3000 words)</p>
                             <p><strong>Submission:</strong> johan.jacquemin@um6p.ma</p>
+                            <p><strong>Your Role:</strong> <span id="userRoleDisplay"></span></p>
                         </div>
                     </div>
 
@@ -622,14 +748,17 @@
                     <div class="card">
                         <div class="card-header">
                             <span>💾</span>
-                            <h3>Data Management</h3>
+                            <h3>Quick Actions</h3>
                         </div>
-                        <div class="data-actions">
-                            <button class="btn" onclick="exportAllData()">
-                                💾 Export All Data
+                        <div class="editor-buttons">
+                            <button class="btn btn-small" onclick="saveAllData()">
+                                💾 Save All Now
                             </button>
-                            <button class="btn btn-secondary" onclick="clearLocalData()">
-                                🗑️ Clear Local Data
+                            <button class="btn btn-secondary btn-small" onclick="exportAllData()">
+                                📥 Export All Data
+                            </button>
+                            <button class="btn btn-success btn-small" onclick="createBackup()">
+                                🛡️ Create Backup
                             </button>
                         </div>
                     </div>
@@ -648,6 +777,9 @@
                         <div>Word Count: <span id="wordCount">0</span> words</div>
                         <div>Page Count: <span id="pageCount">0</span> / 10 pages</div>
                         <div>Target: 3000 words (approx. 10 pages)</div>
+                        <div class="word-count-progress">
+                            <div class="word-count-progress-bar" id="wordProgressBar"></div>
+                        </div>
                     </div>
 
                     <textarea id="reportEditor" placeholder="Start writing your 10-page scientific report here...
@@ -664,15 +796,15 @@ Remember to use ACS citation style for references."></textarea>
 
                     <div class="editor-buttons">
                         <button class="btn" onclick="saveReport()">
-                            💾 Save Report
+                            💾 Save Report Now
                         </button>
                         <button class="btn btn-secondary" onclick="exportReportPDF()">
-                            📄 Download as PDF
+                            📄 Download as Text
                         </button>
                         <button class="btn btn-secondary" onclick="copyReportToClipboard()">
                             📋 Copy to Clipboard
                         </button>
-                        <button class="btn btn-secondary" onclick="clearReport()">
+                        <button class="btn btn-warning" onclick="clearReport()">
                             🗑️ Clear Report
                         </button>
                     </div>
@@ -688,7 +820,7 @@ Remember to use ACS citation style for references."></textarea>
                     </div>
 
                     <div class="task-input">
-                        <input type="text" id="newTaskInput" placeholder="Add a new task...">
+                        <input type="text" id="newTaskInput" placeholder="Add a new task..." onkeypress="if(event.key === 'Enter') addTask()">
                         <button class="btn" onclick="addTask()">
                             ➕ Add Task
                         </button>
@@ -711,7 +843,7 @@ Remember to use ACS citation style for references."></textarea>
                         <button class="btn btn-secondary" onclick="resetToDefaultTasks()">
                             🔄 Reset to Default Tasks
                         </button>
-                        <button class="btn btn-secondary" onclick="clearAllTasks()">
+                        <button class="btn btn-warning" onclick="clearAllTasks()">
                             🗑️ Clear All Tasks
                         </button>
                     </div>
@@ -736,7 +868,7 @@ Remember to use ACS citation style for references."></textarea>
 
                     <div class="article-form">
                         <div class="form-row">
-                            <input type="text" id="articleTitle" placeholder="Article Title">
+                            <input type="text" id="articleTitle" placeholder="Article Title" onkeypress="if(event.key === 'Enter') addArticle()">
                             <input type="text" id="articleUrl" placeholder="DOI or URL (optional)">
                         </div>
                         <div class="form-row">
@@ -793,7 +925,7 @@ Remember to use ACS citation style for references."></textarea>
                             <p>Royal Society of Chemistry publications on materials science</p>
                         </a>
 
-                        <a href="https://pubs.acs.org/" target="_blank" class="tool-card">
+                        <a href="https://pubs.acs.org/" target="_blank" class="ool-card">
                             <div class="tool-icon">🔍</div>
                             <h4>ACS Publications</h4>
                             <p>American Chemical Society journals and articles</p>
@@ -856,7 +988,7 @@ Remember to use ACS citation style for references."></textarea>
                         </button>
                     </div>
 
-                    <div class="instructions">
+                    <div class="instructions" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
                         <h4>📋 ACS Style Guidelines:</h4>
                         <ul>
                             <li>Authors: Last Name, First Initial.; Last Name, First Initial.</li>
@@ -866,6 +998,61 @@ Remember to use ACS citation style for references."></textarea>
                             <li>DOI if available</li>
                         </ul>
                         <p><strong>Example:</strong> Smith, J. R.; Johnson, A. B. Advances in Lithium-Ion Battery Technology. <em>J. Electrochem. Soc.</em> 2024, <em>171</em>(3), 1234-1245. DOI: 10.1149/123456</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Backup Section -->
+            <div id="backup" class="content-area">
+                <div class="card">
+                    <div class="card-header">
+                        <span>💾</span>
+                        <h3>Data Backup & Recovery</h3>
+                    </div>
+
+                    <div class="backup-section">
+                        <h4 style="color: var(--accent-blue); margin-bottom: 15px;">🛡️ Your Data Protection Center</h4>
+                        <p style="color: var(--accent-light); margin-bottom: 20px; font-size: 14px;">
+                            Your work is saved in your browser's localStorage. Use these tools to backup and protect your data.
+                        </p>
+
+                        <div class="backup-options">
+                            <button class="btn" onclick="exportAllData()">
+                                📥 Export All Data
+                            </button>
+                            <button class="btn btn-secondary" onclick="createBackup()">
+                                🛡️ Create Backup
+                            </button>
+                            <button class="btn btn-secondary" onclick="restoreFromBackup()">
+                                🔄 Restore Backup
+                            </button>
+                            <button class="btn btn-warning" onclick="showStorageInfo()">
+                                ℹ️ Storage Info
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        <h4 style="color: var(--accent-blue); margin-bottom: 15px;">📊 Data Statistics</h4>
+                        <div id="dataStats" style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px;">
+                            <!-- Data stats will be populated here -->
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px;">
+                        <h4 style="color: var(--warning); margin-bottom: 15px;">⚠️ Critical Warnings</h4>
+                        <div style="background: rgba(255,107,107,0.1); padding: 15px; border-radius: 8px; font-size: 13px;">
+                            <p><strong>Data is stored ONLY in this browser on this computer.</strong></p>
+                            <ul style="margin-top: 10px; padding-left: 20px;">
+                                <li>Clearing browser history/cache will DELETE your work</li>
+                                <li>Using a different browser or computer = different storage</li>
+                                <li>Private/incognito mode doesn't save data</li>
+                                <li>Browser updates sometimes clear data</li>
+                            </ul>
+                            <p style="margin-top: 10px; color: var(--accent-blue);">
+                                <strong>Solution:</strong> Export your data regularly!
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -886,6 +1073,9 @@ Remember to use ACS citation style for references."></textarea>
                         <button class="btn" onclick="exportAllUsersData()">
                             📊 Export All Users Data
                         </button>
+                        <button class="btn btn-secondary" onclick="backupAllUsersData()">
+                            🛡️ Backup All Users
+                        </button>
                         <button class="btn btn-warning" onclick="resetAllUsersData()">
                             🔄 Reset All Users Data
                         </button>
@@ -903,6 +1093,9 @@ Remember to use ACS citation style for references."></textarea>
         let userTasks = [];
         let userArticles = [];
         let userReport = "";
+        let autoSaveInterval;
+        let lastSaveTime = new Date();
+        let isSaving = false;
 
         // ====================
         // INITIALIZATION
@@ -918,6 +1111,8 @@ Remember to use ACS citation style for references."></textarea>
             currentUser = JSON.parse(storedUser);
             loadUserData();
             updateUI();
+            setupAutoSave();
+            updateLastSavedTime();
             checkPeerEvaluationReminder();
             
             // Set current date
@@ -932,7 +1127,97 @@ Remember to use ACS citation style for references."></textarea>
             if (userTasks.length === 0) {
                 resetToDefaultTasks();
             }
+
+            // Setup auto-save indicator
+            setupSaveIndicator();
+
+            // Setup beforeunload warning
+            window.addEventListener('beforeunload', function (e) {
+                // Only warn if there's unsaved changes
+                if (hasUnsavedChanges()) {
+                    e.preventDefault();
+                    e.returnValue = 'You have unsaved changes! Are you sure you want to leave?';
+                    return e.returnValue;
+                }
+            });
         };
+
+        // ====================
+        // AUTO-SAVE SYSTEM
+        // ====================
+        function setupAutoSave() {
+            // Auto-save every 30 seconds
+            autoSaveInterval = setInterval(() => {
+                if (!isSaving) {
+                    saveAllData();
+                }
+            }, 30000);
+
+            // Auto-save when report changes
+            document.getElementById('reportEditor').addEventListener('input', function() {
+                updateWordCount();
+                // Mark as needing save
+                userReport = this.value;
+            });
+
+            // Auto-save when tasks change
+            document.getElementById('taskList').addEventListener('change', function() {
+                scheduleSave();
+            });
+        }
+
+        function setupSaveIndicator() {
+            setInterval(() => {
+                const now = new Date();
+                const diff = Math.floor((now - lastSaveTime) / 1000);
+                
+                if (diff < 30) {
+                    document.getElementById('saveStatus').textContent = 'Saved just now';
+                    document.getElementById('saveIndicator').className = 'auto-save-indicator saved';
+                } else if (diff < 60) {
+                    document.getElementById('saveStatus').textContent = 'Saved ' + diff + 's ago';
+                    document.getElementById('saveIndicator').className = 'auto-save-indicator';
+                } else {
+                    document.getElementById('saveStatus').textContent = 'Saving soon...';
+                    document.getElementById('saveIndicator').className = 'auto-save-indicator';
+                }
+
+                // Update data status indicator
+                const indicator = document.getElementById('autoSaveIndicator');
+                if (isSaving) {
+                    indicator.className = 'pulse';
+                    indicator.style.color = 'var(--warning)';
+                } else if (diff < 10) {
+                    indicator.className = '';
+                    indicator.style.color = 'var(--success)';
+                } else {
+                    indicator.className = '';
+                    indicator.style.color = 'var(--accent-blue)';
+                }
+            }, 1000);
+        }
+
+        function scheduleSave() {
+            if (!isSaving) {
+                isSaving = true;
+                setTimeout(() => {
+                    saveAllData();
+                    isSaving = false;
+                }, 1000);
+            }
+        }
+
+        function updateLastSavedTime() {
+            lastSaveTime = new Date();
+            const timeStr = lastSaveTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('lastSaved').textContent = timeStr;
+        }
+
+        function hasUnsavedChanges() {
+            // Check if report editor has unsaved changes
+            const editorContent = document.getElementById('reportEditor').value;
+            return editorContent !== userReport;
+        }
 
         // ====================
         // DATA MANAGEMENT
@@ -952,16 +1237,174 @@ Remember to use ACS citation style for references."></textarea>
             const storedReport = localStorage.getItem(`report_${userId}`);
             userReport = storedReport || "";
             
+            // Check for backup
+            const backup = localStorage.getItem(`backup_${userId}`);
+            if (backup && !storedReport && !storedTasks && !storedArticles) {
+                if (confirm('Found a backup of your data. Restore it?')) {
+                    restoreFromBackup();
+                    return;
+                }
+            }
+            
             updateTaskDisplay();
             updateArticlesDisplay();
             updateReportDisplay();
+            updateDataStats();
         }
 
-        function saveUserData() {
+        function saveAllData() {
             const userId = currentUser.id;
+            
+            // Save current report from editor
+            userReport = document.getElementById('reportEditor').value;
+            
+            // Save to localStorage
             localStorage.setItem(`tasks_${userId}`, JSON.stringify(userTasks));
             localStorage.setItem(`articles_${userId}`, JSON.stringify(userArticles));
             localStorage.setItem(`report_${userId}`, userReport);
+            
+            // Create backup
+            createBackup();
+            
+            // Update UI
+            updateLastSavedTime();
+            showNotification('All data saved successfully!', 'success');
+            updateDashboardStats();
+        }
+
+        function saveUserData() {
+            saveAllData();
+        }
+
+        // ====================
+        // BACKUP & RECOVERY
+        // ====================
+        function createBackup() {
+            const userId = currentUser.id;
+            const backupData = {
+                tasks: userTasks,
+                articles: userArticles,
+                report: userReport,
+                timestamp: new Date().toISOString(),
+                browserId: localStorage.getItem('browserId') || 'unknown'
+            };
+            
+            localStorage.setItem(`backup_${userId}`, JSON.stringify(backupData));
+            
+            // Keep only last 5 backups
+            let backupCount = 0;
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith(`backup_${userId}_`)) {
+                    backupCount++;
+                    if (backupCount > 5) {
+                        localStorage.removeItem(key);
+                    }
+                }
+            }
+            
+            console.log('Backup created at:', backupData.timestamp);
+        }
+
+        function restoreFromBackup() {
+            const userId = currentUser.id;
+            const backup = localStorage.getItem(`backup_${userId}`);
+            
+            if (!backup) {
+                showNotification('No backup found to restore!', 'warning');
+                return;
+            }
+            
+            if (confirm('Restore from backup? This will replace your current data.')) {
+                try {
+                    const backupData = JSON.parse(backup);
+                    userTasks = backupData.tasks || [];
+                    userArticles = backupData.articles || [];
+                    userReport = backupData.report || '';
+                    
+                    saveAllData();
+                    updateTaskDisplay();
+                    updateArticlesDisplay();
+                    updateReportDisplay();
+                    showNotification('Data restored from backup!', 'success');
+                } catch (e) {
+                    showNotification('Error restoring backup: ' + e.message, 'warning');
+                }
+            }
+        }
+
+        function updateDataStats() {
+            const statsDiv = document.getElementById('dataStats');
+            if (!statsDiv) return;
+            
+            const reportSize = new Blob([userReport]).size;
+            const tasksSize = new Blob([JSON.stringify(userTasks)]).size;
+            const articlesSize = new Blob([JSON.stringify(userArticles)]).size;
+            const totalSize = (reportSize + tasksSize + articlesSize) / 1024; // KB
+            
+            const backup = localStorage.getItem(`backup_${currentUser.id}`);
+            const hasBackup = backup ? '✅' : '❌';
+            
+            statsDiv.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                    <div>
+                        <div style="color: var(--accent-light); font-size: 12px;">Report Size</div>
+                        <div style="color: var(--accent-blue);">${(reportSize / 1024).toFixed(2)} KB</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--accent-light); font-size: 12px;">Tasks</div>
+                        <div style="color: var(--accent-blue);">${userTasks.length}</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--accent-light); font-size: 12px;">Articles</div>
+                        <div style="color: var(--accent-blue);">${userArticles.length}</div>
+                    </div>
+                    <div>
+                        <div style="color: var(--accent-light); font-size: 12px;">Backup</div>
+                        <div style="color: var(--accent-blue);">${hasBackup}</div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <div style="color: var(--accent-light); font-size: 12px;">Total Storage Used</div>
+                    <div style="color: var(--accent-blue); font-size: 18px; font-weight: bold;">${totalSize.toFixed(2)} KB</div>
+                    <div style="font-size: 11px; color: var(--accent-light);">
+                        ${((totalSize / (5 * 1024)) * 100).toFixed(1)}% of 5MB limit
+                    </div>
+                </div>
+            `;
+        }
+
+        function showStorageInfo() {
+            let totalSize = 0;
+            let itemCount = 0;
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                totalSize += (key.length + value.length) * 2; // Approximate size in bytes
+                itemCount++;
+            }
+            
+            const info = `
+💾 BROWSER STORAGE INFORMATION:
+
+Total items: ${itemCount}
+Total size: ${(totalSize / 1024).toFixed(2)} KB
+Storage limit: ~5 MB
+Usage: ${((totalSize / (5 * 1024 * 1024)) * 100).toFixed(1)}%
+
+📁 YOUR DATA:
+- Report: ${(new Blob([userReport]).size / 1024).toFixed(2)} KB
+- Tasks: ${userTasks.length} items
+- Articles: ${userArticles.length} items
+
+⚠️ REMEMBER:
+- Data is browser-specific
+- Export regularly for safety
+- Use same browser always
+            `;
+            
+            alert(info);
         }
 
         // ====================
@@ -973,7 +1416,14 @@ Remember to use ACS citation style for references."></textarea>
                 <h3>${currentUser.name}</h3>
                 <p>${currentUser.email}</p>
                 <span class="user-role ${currentUser.role}">${currentUser.role.toUpperCase()}</span>
+                <div class="data-status">
+                    <span class="pulse" id="autoSaveIndicator">●</span>
+                    <span id="lastSaved">Just now</span>
+                </div>
             `;
+
+            // Show user role
+            document.getElementById('userRoleDisplay').textContent = currentUser.role === 'admin' ? 'Admin (can view all data)' : 'Researcher (private workspace)';
 
             // Show/hide admin menu item
             const adminMenuItems = document.querySelectorAll('.admin-only');
@@ -983,6 +1433,7 @@ Remember to use ACS citation style for references."></textarea>
 
             // Update dashboard stats
             updateDashboardStats();
+            updateDataStats();
         }
 
         function updateDashboardStats() {
@@ -998,7 +1449,7 @@ Remember to use ACS citation style for references."></textarea>
                         <span>${progress}%</span>
                     </div>
                     <div style="background: var(--tertiary-dark); height: 10px; border-radius: 5px; overflow: hidden;">
-                        <div style="background: var(--accent-blue); width: ${progress}%; height: 100%;"></div>
+                        <div style="background: var(--accent-blue); width: ${progress}%; height: 100%; transition: width 0.5s;"></div>
                     </div>
                     <div style="margin-top: 10px; font-size: 12px; color: var(--accent-light);">
                         ${completed} of ${total} tasks completed
@@ -1009,6 +1460,7 @@ Remember to use ACS citation style for references."></textarea>
             // Report status
             const wordCount = userReport.split(/\s+/).filter(word => word.length > 0).length;
             const pageCount = Math.ceil(wordCount / 300);
+            const progressPercent = Math.min(100, (wordCount / 3000) * 100);
             
             document.getElementById('reportStatus').innerHTML = `
                 <div style="margin: 10px 0;">
@@ -1018,20 +1470,35 @@ Remember to use ACS citation style for references."></textarea>
                     <div style="font-size: 14px; color: var(--accent-light);">
                         Approximately ${pageCount} of 10 pages
                     </div>
-                    <div style="margin-top: 10px; font-size: 12px;">
-                        ${wordCount >= 3000 ? '✅ Target reached!' : `Need ${3000 - wordCount} more words`}
+                    <div style="margin-top: 10px;">
+                        <div style="background: var(--tertiary-dark); height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div style="background: var(--accent-blue); width: ${progressPercent}%; height: 100%;"></div>
+                        </div>
+                        <div style="font-size: 12px; margin-top: 5px;">
+                            ${wordCount >= 3000 ? '✅ Target reached!' : `Need ${3000 - wordCount} more words`}
+                        </div>
                     </div>
                 </div>
             `;
 
             // Literature stats
+            const categories = {};
+            userArticles.forEach(article => {
+                categories[article.category] = (categories[article.category] || 0) + 1;
+            });
+            
+            let categoriesText = '';
+            for (const [cat, count] of Object.entries(categories)) {
+                categoriesText += `${cat}: ${count}<br>`;
+            }
+            
             document.getElementById('literatureStats').innerHTML = `
                 <div style="margin: 10px 0;">
                     <div style="font-size: 24px; color: var(--accent-blue); font-weight: bold;">
                         ${userArticles.length} articles
                     </div>
                     <div style="font-size: 12px; color: var(--accent-light); margin-top: 5px;">
-                        Categorized by relevance for your research
+                        ${categoriesText || 'No articles categorized yet'}
                     </div>
                 </div>
             `;
@@ -1042,23 +1509,35 @@ Remember to use ACS citation style for references."></textarea>
             const daysUntilDeadline = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
             
             let reminderText = '';
+            let reminderColor = 'var(--accent-blue)';
+            
             if (daysUntilDeadline <= 0) {
                 reminderText = '⚠️ Peer evaluations are overdue!';
+                reminderColor = 'var(--warning)';
             } else if (daysUntilDeadline <= 7) {
                 reminderText = `⚠️ Peer evaluations due in ${daysUntilDeadline} days!`;
+                reminderColor = 'var(--warning)';
             } else if (daysUntilDeadline <= 14) {
                 reminderText = `ℹ️ Peer evaluations due in ${daysUntilDeadline} days`;
+                reminderColor = 'var(--accent-blue)';
             } else {
                 reminderText = `✅ Peer evaluations due in ${daysUntilDeadline} days`;
+                reminderColor = 'var(--success)';
             }
             
             document.getElementById('peerEvalReminder').innerHTML = `
                 <div style="margin: 10px 0;">
-                    <div style="color: ${daysUntilDeadline <= 7 ? 'var(--warning)' : 'var(--accent-blue)'}">
+                    <div style="color: ${reminderColor}; font-weight: bold;">
                         ${reminderText}
                     </div>
                     <div style="font-size: 12px; color: var(--accent-light); margin-top: 5px;">
                         Due: January 23, 2026
+                    </div>
+                    <div style="margin-top: 15px; font-size: 11px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 5px;">
+                        <strong>Task Support & Involvement:</strong>
+                        <br>• Help teammates with their sections
+                        <br>• Participate in group discussions
+                        <br>• Provide constructive feedback
                     </div>
                 </div>
             `;
@@ -1068,6 +1547,11 @@ Remember to use ACS citation style for references."></textarea>
         // SECTION NAVIGATION
         // ====================
         function showSection(sectionId) {
+            // Save current data before switching sections
+            if (hasUnsavedChanges()) {
+                saveReport();
+            }
+            
             // Hide all sections
             document.querySelectorAll('.content-area').forEach(section => {
                 section.classList.remove('active');
@@ -1092,6 +1576,7 @@ Remember to use ACS citation style for references."></textarea>
                 'literature': 'Literature Repository',
                 'chemistry': 'Chemistry Toolkit',
                 'references': 'ACS Reference Generator',
+                'backup': 'Data Backup',
                 'admin': 'Admin Panel'
             };
             
@@ -1116,25 +1601,26 @@ Remember to use ACS citation style for references."></textarea>
             const text = document.getElementById('reportEditor').value;
             const wordCount = text.split(/\s+/).filter(word => word.length > 0).length;
             const pageCount = Math.ceil(wordCount / 300);
+            const progressPercent = Math.min(100, (wordCount / 3000) * 100);
             
             document.getElementById('wordCount').textContent = wordCount;
             document.getElementById('pageCount').textContent = pageCount;
+            document.getElementById('wordProgressBar').style.width = `${progressPercent}%`;
             
-            // Auto-save on significant changes
-            if (text !== userReport && wordCount % 50 === 0) {
-                userReport = text;
-                saveReport();
+            // Update progress bar color based on completion
+            const progressBar = document.getElementById('wordProgressBar');
+            if (progressPercent >= 100) {
+                progressBar.style.background = 'var(--success)';
+            } else if (progressPercent >= 70) {
+                progressBar.style.background = 'var(--accent-blue)';
+            } else {
+                progressBar.style.background = 'var(--warning)';
             }
         }
 
         function saveReport() {
             userReport = document.getElementById('reportEditor').value;
-            const userId = currentUser.id;
-            localStorage.setItem(`report_${userId}`, userReport);
-            
-            // Show success message
-            showNotification('Report saved successfully!', 'success');
-            updateDashboardStats();
+            saveAllData();
         }
 
         function exportReportPDF() {
@@ -1143,7 +1629,7 @@ Remember to use ACS citation style for references."></textarea>
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `WickedProblems_Report_${currentUser.name.replace(/\s+/g, '_')}.txt`;
+            a.download = `WickedProblems_Report_${currentUser.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1240,9 +1726,7 @@ Remember to use ACS citation style for references."></textarea>
         }
 
         function saveTasks() {
-            const userId = currentUser.id;
-            localStorage.setItem(`tasks_${userId}`, JSON.stringify(userTasks));
-            showNotification('Tasks saved!', 'success');
+            scheduleSave();
         }
 
         function resetToDefaultTasks() {
@@ -1381,8 +1865,7 @@ Remember to use ACS citation style for references."></textarea>
         }
 
         function saveArticles() {
-            const userId = currentUser.id;
-            localStorage.setItem(`articles_${userId}`, JSON.stringify(userArticles));
+            scheduleSave();
         }
 
         // ====================
@@ -1442,6 +1925,7 @@ Remember to use ACS citation style for references."></textarea>
                 const userReport = localStorage.getItem(`report_${user.id}`) || '';
                 const wordCount = userReport.split(/\s+/).filter(w => w.length > 0).length;
                 const completedTasks = userTasks.filter(t => t.completed).length;
+                const hasBackup = localStorage.getItem(`backup_${user.id}`) ? '✅' : '❌';
                 
                 return `
                     <div class="admin-user-card">
@@ -1451,7 +1935,7 @@ Remember to use ACS citation style for references."></textarea>
                                 <p style="font-size: 12px; color: var(--accent-light);">${user.email}</p>
                                 <span class="user-role ${user.role}" style="margin-top: 5px;">${user.role.toUpperCase()}</span>
                             </div>
-                            <button class="btn btn-secondary" onclick="viewUserData(${user.id})" style="font-size: 12px; padding: 8px 12px;">
+                            <button class="btn btn-secondary btn-small" onclick="viewUserData(${user.id})">
                                 View Data
                             </button>
                         </div>
@@ -1471,10 +1955,19 @@ Remember to use ACS citation style for references."></textarea>
                                     <div style="color: var(--accent-blue);">${userArticles.length}</div>
                                 </div>
                                 <div>
-                                    <div style="color: var(--accent-light);">Last Active</div>
-                                    <div style="color: var(--accent-blue);">Today</div>
+                                    <div style="color: var(--accent-light);">Backup</div>
+                                    <div style="color: var(--accent-blue);">${hasBackup}</div>
                                 </div>
                             </div>
+                        </div>
+                        
+                        <div style="margin-top: 15px; display: flex; gap: 10px;">
+                            <button class="btn btn-secondary btn-small" onclick="exportUserData(${user.id})">
+                                Export
+                            </button>
+                            <button class="btn btn-warning btn-small" onclick="resetUserData(${user.id})">
+                                Reset
+                            </button>
                         </div>
                     </div>
                 `;
@@ -1486,65 +1979,154 @@ Remember to use ACS citation style for references."></textarea>
             const userArticles = JSON.parse(localStorage.getItem(`articles_${userId}`)) || [];
             const userReport = localStorage.getItem(`report_${userId}`) || '';
             
-            let message = `USER DATA REPORT\n\n`;
+            let message = `👤 USER DATA REPORT\n\n`;
             message += `Tasks (${userTasks.length}):\n`;
-            userTasks.forEach(task => {
-                message += `  ${task.completed ? '✅' : '⬜'} ${task.text}\n`;
+            userTasks.forEach((task, index) => {
+                message += `  ${index + 1}. [${task.completed ? '✅' : '⬜'}] ${task.text}\n`;
             });
             
             message += `\nArticles (${userArticles.length}):\n`;
-            userArticles.forEach(article => {
-                message += `  📚 ${article.title}\n`;
+            userArticles.forEach((article, index) => {
+                message += `  ${index + 1}. ${article.title}\n`;
             });
             
             message += `\nReport Summary:\n`;
+            const wordCount = userReport.split(/\s+/).filter(w => w.length > 0).length;
+            message += `  ${wordCount} words (${Math.ceil(wordCount/300)} pages)\n`;
             message += `  ${userReport.length} characters\n`;
-            message += `  ${userReport.split(/\s+/).filter(w => w.length > 0).length} words\n`;
+            message += `  ${wordCount >= 3000 ? '✅ Target reached' : `❌ Needs ${3000 - wordCount} more words`}\n`;
             
             alert(message);
         }
 
-        function exportAllUsersData() {
-            if (!currentUser.isAdmin) return;
+        function exportUserData(userId) {
+            const predefinedUsers = JSON.parse(localStorage.getItem('wickedProblemsUsers')) || [];
+            const user = predefinedUsers.find(u => u.id === userId);
+            if (!user) return;
             
+            const userTasks = JSON.parse(localStorage.getItem(`tasks_${userId}`)) || [];
+            const userArticles = JSON.parse(localStorage.getItem(`articles_${userId}`)) || [];
+            const userReport = localStorage.getItem(`report_${userId}`) || '';
+            
+            let exportData = `WICKED PROBLEMS HUB - USER DATA EXPORT\n`;
+            exportData += `User: ${user.name} (${user.email})\n`;
+            exportData += `Role: ${user.role}\n`;
+            exportData += `Exported: ${new Date().toLocaleString()}\n`;
+            exportData += '='.repeat(60) + '\n\n';
+            
+            exportData += '📋 TASKS:\n';
+            userTasks.forEach((task, index) => {
+                exportData += `  ${index + 1}. [${task.completed ? 'X' : ' '}] ${task.text}\n`;
+            });
+            
+            exportData += '\n📚 ARTICLES:\n';
+            userArticles.forEach((article, index) => {
+                exportData += `  ${index + 1}. ${article.title}\n`;
+                if (article.authors) exportData += `     Authors: ${article.authors}\n`;
+                if (article.url) exportData += `     URL: ${article.url}\n`;
+                exportData += `     Category: ${getCategoryName(article.category)}\n`;
+            });
+            
+            exportData += '\n📝 REPORT:\n';
+            exportData += userReport;
+            
+            const blob = new Blob([exportData], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `wicked_problems_${user.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification(`Exported data for ${user.name}!`, 'success');
+        }
+
+        function resetUserData(userId) {
+            if (confirm('Reset this user\'s data? This will delete their report, tasks, and articles.')) {
+                localStorage.removeItem(`tasks_${userId}`);
+                localStorage.removeItem(`articles_${userId}`);
+                localStorage.removeItem(`report_${userId}`);
+                localStorage.removeItem(`backup_${userId}`);
+                loadAdminView();
+                showNotification('User data reset!', 'success');
+            }
+        }
+
+        function exportAllUsersData() {
             const predefinedUsers = JSON.parse(localStorage.getItem('wickedProblemsUsers')) || [];
             let exportData = 'WICKED PROBLEMS HUB - ALL USERS DATA EXPORT\n';
-            exportData += '='.repeat(50) + '\n\n';
+            exportData += 'Generated: ' + new Date().toLocaleString() + '\n';
+            exportData += '='.repeat(60) + '\n\n';
             
             predefinedUsers.forEach(user => {
-                exportData += `USER: ${user.name} (${user.email})\n`;
-                exportData += '-'.repeat(40) + '\n';
+                exportData += `👤 USER: ${user.name} (${user.email})\n`;
+                exportData += '─'.repeat(40) + '\n';
                 
                 const userTasks = JSON.parse(localStorage.getItem(`tasks_${user.id}`)) || [];
                 const userArticles = JSON.parse(localStorage.getItem(`articles_${user.id}`)) || [];
-                const userReport = localStorage.getItem(`report_${userId}`) || '';
+                const userReport = localStorage.getItem(`report_${user.id}`) || '';
                 
-                exportData += 'TASKS:\n';
-                userTasks.forEach(task => {
-                    exportData += `  [${task.completed ? 'X' : ' '}] ${task.text}\n`;
+                exportData += '📋 TASKS:\n';
+                userTasks.forEach((task, index) => {
+                    exportData += `  ${index + 1}. [${task.completed ? '✅' : '⬜'}] ${task.text}\n`;
                 });
                 
-                exportData += '\nARTICLES:\n';
-                userArticles.forEach(article => {
-                    exportData += `  • ${article.title}\n`;
+                exportData += '\n📚 ARTICLES:\n';
+                userArticles.forEach((article, index) => {
+                    exportData += `  ${index + 1}. ${article.title}\n`;
                 });
                 
-                exportData += '\nREPORT:\n';
-                exportData += userReport.substring(0, 500) + '...\n\n';
-                exportData += '='.repeat(50) + '\n\n';
+                exportData += '\n📝 REPORT SUMMARY:\n';
+                const wordCount = userReport.split(/\s+/).filter(w => w.length > 0).length;
+                exportData += `  Words: ${wordCount}\n`;
+                exportData += `  Characters: ${userReport.length}\n`;
+                exportData += `  Preview: ${userReport.substring(0, 200)}...\n`;
+                
+                exportData += '\n' + '='.repeat(60) + '\n\n';
             });
             
             const blob = new Blob([exportData], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `WickedProblems_AllUsers_${new Date().toISOString().split('T')[0]}.txt`;
+            a.download = `wicked_problems_all_users_${new Date().toISOString().split('T')[0]}.txt`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
             showNotification('All users data exported!', 'success');
+        }
+
+        function backupAllUsersData() {
+            const predefinedUsers = JSON.parse(localStorage.getItem('wickedProblemsUsers')) || [];
+            const backup = {
+                timestamp: new Date().toISOString(),
+                users: predefinedUsers,
+                data: {}
+            };
+            
+            predefinedUsers.forEach(user => {
+                backup.data[user.id] = {
+                    tasks: JSON.parse(localStorage.getItem(`tasks_${user.id}`)) || [],
+                    articles: JSON.parse(localStorage.getItem(`articles_${user.id}`)) || [],
+                    report: localStorage.getItem(`report_${user.id}`) || ''
+                };
+            });
+            
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `wicked_problems_backup_all_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('All users data backed up!', 'success');
         }
 
         function resetAllUsersData() {
@@ -1556,6 +2138,7 @@ Remember to use ACS citation style for references."></textarea>
                     localStorage.removeItem(`tasks_${user.id}`);
                     localStorage.removeItem(`articles_${user.id}`);
                     localStorage.removeItem(`report_${user.id}`);
+                    localStorage.removeItem(`backup_${user.id}`);
                 });
                 
                 showNotification('All users data has been reset!', 'success');
@@ -1564,62 +2147,18 @@ Remember to use ACS citation style for references."></textarea>
         }
 
         // ====================
-        // UTILITY FUNCTIONS
+        // DATA EXPORT
         // ====================
-        function logout() {
-            localStorage.removeItem('currentUser');
-            window.location.href = 'index.html';
-        }
-
-        function checkPeerEvaluationReminder() {
-            const deadline = new Date('2026-01-23');
-            const today = new Date();
-            const daysUntilDeadline = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
-            
-            if (daysUntilDeadline <= 7 && daysUntilDeadline > 0) {
-                setTimeout(() => {
-                    if (confirm(`⚠️ PEER EVALUATION REMINDER\n\nPeer evaluations are due in ${daysUntilDeadline} days (January 23, 2026).\n\nPlease complete your peer evaluation forms soon!`)) {
-                        showSection('dashboard');
-                    }
-                }, 2000);
-            }
-        }
-
-        function showNotification(message, type = 'info') {
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: ${type === 'success' ? 'var(--success)' : type === 'warning' ? 'var(--warning)' : 'var(--accent-blue)'};
-                color: ${type === 'success' || type === 'warning' ? 'white' : 'var(--primary-dark)'};
-                padding: 15px 20px;
-                border-radius: 8px;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-                z-index: 1000;
-                animation: slideIn 0.3s ease;
-            `;
-            
-            notification.innerHTML = message;
-            document.body.appendChild(notification);
-            
-            // Remove after 3 seconds
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
-        }
-
         function exportAllData() {
             const exportObj = {
                 user: currentUser,
                 tasks: userTasks,
                 articles: userArticles,
                 report: userReport,
-                exportedAt: new Date().toISOString()
+                exportedAt: new Date().toISOString(),
+                wordCount: userReport.split(/\s+/).filter(w => w.length > 0).length,
+                taskCompletion: `${userTasks.filter(t => t.completed).length}/${userTasks.length}`,
+                articleCount: userArticles.length
             };
             
             const blob = new Blob([JSON.stringify(exportObj, null, 2)], { type: 'application/json' });
@@ -1635,12 +2174,82 @@ Remember to use ACS citation style for references."></textarea>
             showNotification('All data exported successfully!', 'success');
         }
 
+        // ====================
+        // UTILITY FUNCTIONS
+        // ====================
+        function logout() {
+            // Save all data before logging out
+            saveAllData();
+            
+            // Clear only session data, NOT user work
+            localStorage.removeItem('currentUser');
+            
+            // Show confirmation
+            showNotification('All data saved! Redirecting to login...', 'success');
+            
+            // Redirect after delay
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        }
+
+        function checkPeerEvaluationReminder() {
+            const deadline = new Date('2026-01-23');
+            const today = new Date();
+            const daysUntilDeadline = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+            
+            if (daysUntilDeadline <= 7 && daysUntilDeadline > 0) {
+                setTimeout(() => {
+                    if (confirm(`⚠️ PEER EVALUATION REMINDER\n\nPeer evaluations are due in ${daysUntilDeadline} days (January 23, 2026).\n\nRemember to evaluate your teammates based on:\n• Task Support\n• Involvement\n• Quality of Work`)) {
+                        showSection('dashboard');
+                    }
+                }, 2000);
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'var(--success)' : type === 'warning' ? 'var(--warning)' : 'var(--accent-blue)'};
+                color: ${type === 'success' || type === 'warning' ? 'white' : 'var(--primary-dark)'};
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            `;
+            
+            notification.innerHTML = `
+                <span>${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️'}</span>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Clear localStorage (with confirmation)
         function clearLocalData() {
-            if (confirm('Clear all your local data? This will delete your report, tasks, and articles. This cannot be undone.')) {
+            if (confirm('⚠️ WARNING: This will delete ALL your work in this browser!\n\nThis includes:\n• Your report\n• All tasks\n• All saved articles\n\nAre you absolutely sure? Export your data first!')) {
                 const userId = currentUser.id;
                 localStorage.removeItem(`tasks_${userId}`);
                 localStorage.removeItem(`articles_${userId}`);
                 localStorage.removeItem(`report_${userId}`);
+                localStorage.removeItem(`backup_${userId}`);
                 
                 userTasks = [];
                 userArticles = [];
@@ -1649,23 +2258,9 @@ Remember to use ACS citation style for references."></textarea>
                 updateTaskDisplay();
                 updateArticlesDisplay();
                 updateReportDisplay();
-                showNotification('All local data cleared!', 'success');
+                showNotification('All local data cleared!', 'warning');
             }
         }
-
-        // Add CSS animations for notifications
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes slideOut {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
