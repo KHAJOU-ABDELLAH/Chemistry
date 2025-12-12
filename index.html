@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wicked Problems Research Hub - Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary-dark: #0a192f;
+            --secondary-dark: #112240;
+            --accent-blue: #64ffda;
+            --accent-light: #8892b0;
+            --text-light: #ccd6f6;
+            --warning: #ff6b6b;
+            --success: #4ecdc4;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #1a1a2e 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--secondary-dark);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 1200px;
+            min-height: 90vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: rgba(10, 25, 47, 0.9);
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            color: var(--accent-blue);
+            margin-bottom: 5px;
+        }
+
+        .logo span {
+            font-size: 14px;
+            color: var(--accent-light);
+            opacity: 0.8;
+        }
+
+        .login-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 30px;
+            margin-top: 20px;
+        }
+
+        .login-form h2 {
+            color: var(--accent-blue);
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--accent-light);
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: var(--text-light);
+            font-size: 14px;
+            transition: border 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .btn {
+            background: var(--accent-blue);
+            color: var(--primary-dark);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--accent-light);
+            border: 1px solid var(--accent-light);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-section {
+            margin-top: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .admin-section h3 {
+            color: var(--accent-blue);
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .user-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .user-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .user-card.admin {
+            border-left-color: var(--warning);
+        }
+
+        .user-role {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--accent-blue);
+            color: var(--primary-dark);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .user-role.admin {
+            background: var(--warning);
+        }
+
+        .user-info h4 {
+            margin-bottom: 5px;
+            color: var(--text-light);
+        }
+
+        .user-info p {
+            color: var(--accent-light);
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .login-status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .status-success {
+            background: rgba(78, 205, 196, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        .status-error {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid var(--warning);
+            color: var(--warning);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .user-count {
+            background: rgba(100, 255, 218, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .user-count h3 {
+            color: var(--accent-blue);
+            font-size: 18px;
+        }
+
+        .user-count .count {
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--accent-blue);
+            margin: 10px 0;
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            font-size: 14px;
+            color: var(--accent-light);
+        }
+
+        .instructions ul {
+            padding-left: 20px;
+            margin: 10px 0;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <h1>⚗️ Wicked Problems Hub</h1>
+                <span>Critical Raw Materials & Batteries</span>
+                <span>Chemistry 101 Project</span>
+            </div>
+
+            <div class="login-section">
+                <div class="login-form">
+                    <h2>🔐 Member Login</h2>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" placeholder="student@um6p.ma">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="••••••••">
+                    </div>
+                    <button class="btn" onclick="login()">
+                        <span>🚀 Login</span>
+                    </button>
+                    <div id="loginStatus" class="login-status hidden"></div>
+                </div>
+            </div>
+
+            <div class="user-count">
+                <h3>Project Members</h3>
+                <div class="count">6/6</div>
+                <small>2 Admins + 4 Regular Users</small>
+            </div>
+
+            <div class="instructions">
+                <h4>📋 Instructions:</h4>
+                <ul>
+                    <li>Use provided credentials</li>
+                    <li>Data saves automatically</li>
+                    <li>Use same browser</li>
+                    <li>Export work before deadline</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <h2 style="color: var(--accent-blue); margin-bottom: 10px;">👨‍🔬 Admin Control Panel</h2>
+            <p style="color: var(--accent-light); margin-bottom: 30px;">
+                Manage all 6 project members. Admin users have access to all data.
+            </p>
+
+            <div class="admin-section">
+                <h3>👥 User Management</h3>
+                <button class="btn" onclick="generateUsers()">
+                    <span>🔄 Generate User Credentials</span>
+                </button>
+                <button class="btn btn-secondary" onclick="showCredentials()">
+                    <span>📋 Show All Credentials</span>
+                </button>
+            </div>
+
+            <div class="user-grid" id="userGrid">
+                <!-- Users will be populated here -->
+            </div>
+
+            <div class="admin-section">
+                <h3>📊 Project Overview</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 15px;">
+                    <div style="background: rgba(100, 255, 218, 0.1); padding: 15px; border-radius: 10px;">
+                        <small>Due Date</small>
+                        <div style="font-weight: bold; color: var(--accent-blue);">Jan 23, 2026</div>
+                    </div>
+                    <div style="background: rgba(100, 255, 218, 0.1); padding: 15px; border-radius: 10px;">
+                        <small>Report Length</small>
+                        <div style="font-weight: bold; color: var(--accent-blue);">10 Pages</div>
+                    </div>
+                    <div style="background: rgba(100, 255, 218, 0.1); padding: 15px; border-radius: 10px;">
+                        <small>Contact</small>
+                        <div style="font-weight: bold; color: var(--accent-blue);">johan.jacquemin@um6p.ma</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="instructions" style="margin-top: 30px;">
+                <h4>⚠️ Important Notes for Team:</h4>
+                <ul>
+                    <li><strong>Local Storage:</strong> Data is saved to your browser. Use the same computer for all work.</li>
+                    <li><strong>Privacy:</strong> Regular users cannot see each other's data. Admins can view all.</li>
+                    <li><strong>Export:</strong> Always use "Download as PDF" button before logging out.</li>
+                    <li><strong>References:</strong> Use the ACS Reference Generator tool for proper formatting.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Pre-defined user credentials (exactly 6 users)
+        const predefinedUsers = [
+            {
+                id: 1,
+                email: "admin1@wickedproblems.ma",
+                password: "AdminPass123!",
+                name: "Project Lead Admin",
+                role: "admin",
+                isAdmin: true
+            },
+            {
+                id: 2,
+                email: "admin2@wickedproblems.ma",
+                password: "Admin456!Secure",
+                name: "Co-Admin Researcher",
+                role: "admin",
+                isAdmin: true
+            },
+            {
+                id: 3,
+                email: "chem.researcher1@wickedproblems.ma",
+                password: "ChemistryRocks!2025",
+                name: "Material Science Specialist",
+                role: "user",
+                isAdmin: false
+            },
+            {
+                id: 4,
+                email: "chem.researcher2@wickedproblems.ma",
+                password: "BatteryTech!456",
+                name: "Electrochemistry Analyst",
+                role: "user",
+                isAdmin: false
+            },
+            {
+                id: 5,
+                email: "chem.researcher3@wickedproblems.ma",
+                password: "RawMaterials!789",
+                name: "Supply Chain Analyst",
+                role: "user",
+                isAdmin: false
+            },
+            {
+                id: 6,
+                email: "chem.researcher4@wickedproblems.ma",
+                password: "Sustainability!101",
+                name: "Environmental Impact Assessor",
+                role: "user",
+                isAdmin: false
+            }
+        ];
+
+        // Initialize users in localStorage
+        function initializeUsers() {
+            if (!localStorage.getItem('wickedProblemsUsers')) {
+                localStorage.setItem('wickedProblemsUsers', JSON.stringify(predefinedUsers));
+            }
+            displayUsers();
+        }
+
+        // Display all users in the grid
+        function displayUsers() {
+            const users = JSON.parse(localStorage.getItem('wickedProblemsUsers')) || predefinedUsers;
+            const userGrid = document.getElementById('userGrid');
+            
+            userGrid.innerHTML = users.map(user => `
+                <div class="user-card ${user.role}">
+                    <span class="user-role ${user.role}">${user.role.toUpperCase()}</span>
+                    <div class="user-info">
+                        <h4>${user.name}</h4>
+                        <p>${user.email}</p>
+                        <p><small>Password: ${user.password}</small></p>
+                        <p><small>ID: ${user.id}</small></p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Generate/re-generate user credentials
+        function generateUsers() {
+            localStorage.setItem('wickedProblemsUsers', JSON.stringify(predefinedUsers));
+            displayUsers();
+            alert('✅ User credentials have been generated! All 6 users are ready.');
+        }
+
+        // Show all credentials in alert
+        function showCredentials() {
+            const users = JSON.parse(localStorage.getItem('wickedProblemsUsers')) || predefinedUsers;
+            let message = "📋 WICKED PROBLEMS HUB - USER CREDENTIALS\n\n";
+            message += "Copy these credentials for your team:\n\n";
+            
+            users.forEach(user => {
+                message += `${user.name} (${user.role})\n`;
+                message += `Email: ${user.email}\n`;
+                message += `Password: ${user.password}\n`;
+                message += "─".repeat(40) + "\n";
+            });
+            
+            message += "\n⚠️ IMPORTANT: Store these securely!";
+            alert(message);
+        }
+
+        // Login function
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const statusDiv = document.getElementById('loginStatus');
+            
+            const users = JSON.parse(localStorage.getItem('wickedProblemsUsers')) || predefinedUsers;
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                // Store current user info
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                
+                // Show success message
+                statusDiv.className = 'login-status status-success';
+                statusDiv.innerHTML = `✅ Login successful! Welcome ${user.name}. Redirecting to dashboard...`;
+                statusDiv.classList.remove('hidden');
+                
+                // Redirect to dashboard after 1.5 seconds
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+            } else {
+                statusDiv.className = 'login-status status-error';
+                statusDiv.innerHTML = '❌ Invalid email or password. Use provided credentials.';
+                statusDiv.classList.remove('hidden');
+            }
+        }
+
+        // Check for peer evaluation reminder (if near Jan 23, 2026)
+        function checkPeerEvaluationReminder() {
+            const deadline = new Date('2026-01-23');
+            const today = new Date();
+            const daysUntilDeadline = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+            
+            if (daysUntilDeadline <= 14 && daysUntilDeadline > 0) { // Within 2 weeks
+                alert(`⚠️ PEER EVALUATION REMINDER\n\nPeer evaluations are due in ${daysUntilDeadline} days (January 23, 2026).\n\nPlease ensure you complete your peer evaluation forms!`);
+            }
+        }
+
+        // Initialize on page load
+        window.onload = function() {
+            initializeUsers();
+            checkPeerEvaluationReminder();
+        };
+    </script>
+</body>
+</html>
